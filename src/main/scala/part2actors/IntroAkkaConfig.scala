@@ -28,7 +28,7 @@ object IntroAkkaConfig extends App {
   actor ! "A message to remember"
 
   /**
-    * 2 - config file
+    * 2 - config file, by default resources/application.conf
     */
 
   val defaultConfigFileSystem = ActorSystem("DefaultConfigFileDemo")
@@ -38,7 +38,7 @@ object IntroAkkaConfig extends App {
   /**
     * 3 - separate config in the same file
     */
-  val specialConfig = ConfigFactory.load().getConfig("mySpecialConfig")
+  val specialConfig = ConfigFactory.load().getConfig("mySpecialConfig") //name in the file
   val specialConfigSystem = ActorSystem("SpecialConfigDemo", specialConfig)
   val specialConfigActor = specialConfigSystem.actorOf(Props[SimpleLoggingActor])
   specialConfigActor ! "Remember me, I am special"

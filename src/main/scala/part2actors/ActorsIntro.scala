@@ -5,14 +5,16 @@ import akka.actor.{Actor, ActorSystem, Props}
 object ActorsIntro extends App {
 
   // part1 - actor systems
-  val actorSystem = ActorSystem("firstActorSystem")
+  val actorSystem = ActorSystem("firstActorSystem") //Complex data structure controls a number of threads under the hood associated to actors
   println(actorSystem.name)
+
+
 
   // part2 - create actors
   // word count actor
 
   class WordCountActor extends Actor {
-    // internal data
+    // internal data --- mark of a stateful actor
     var totalWords = 0
 
     // behavior
@@ -24,7 +26,7 @@ object ActorsIntro extends App {
     }
   }
 
-  // part3 - instantiate our actor
+  // part3 - instantiate our actor (Not by new but by invoke actor system)
   val wordCounter = actorSystem.actorOf(Props[WordCountActor], "wordCounter")
   val anotherWordCounter = actorSystem.actorOf(Props[WordCountActor], "anotherWordCounter")
 
@@ -35,6 +37,9 @@ object ActorsIntro extends App {
 
 
   object Person {
+
+    //The factory method create Props with actor instances inside
+
     def props(name: String) = Props(new Person(name))
   }
 
@@ -47,6 +52,8 @@ object ActorsIntro extends App {
 
   val person = actorSystem.actorOf(Person.props("Bob"))
   person ! "hi"
+
+  //While this is legal it is not very advisable
 
 
 

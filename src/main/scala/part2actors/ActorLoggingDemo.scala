@@ -16,7 +16,7 @@ object ActorLoggingDemo extends App {
         3 - WARNING/WARN
         4 - ERROR
        */
-      case message => logger.info(message.toString)// LOG it
+      case message => logger.debug(message.toString)// LOG it
     }
   }
 

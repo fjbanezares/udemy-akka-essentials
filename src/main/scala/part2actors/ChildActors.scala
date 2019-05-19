@@ -3,7 +3,7 @@ package part2actors
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import part2actors.ChildActors.CreditCard.{AttachToAccount, CheckStatus}
 
-object ChildActors extends App {
+object  ChildActors extends App {
 
   // Actors can create other actors
 
@@ -16,20 +16,20 @@ object ChildActors extends App {
 
     override def receive: Receive = {
       case CreateChild(name) =>
-        println(s"${self.path} creating child")
+        println(s"${self.path} creating child") //akka://ParentChildDemo/user/parent creating child
         // create a new actor right HERE
         val childRef = context.actorOf(Props[Child], name)
         context.become(withChild(childRef))
     }
 
     def withChild(childRef: ActorRef): Receive = {
-      case TellChild(message) => childRef forward message
+      case TellChild(message) => childRef ! message  //dead Letters si lo mandamos desde fuera
     }
   }
 
-  class Child extends Actor {
+  class  Child extends Actor {
     override def receive: Receive = {
-      case message => println(s"${self.path} I got: $message")
+      case message => println(s"${self.path} I got: $message") //akka://ParentChildDemo/user/parent/child I got: hey Kid!
     }
   }
 

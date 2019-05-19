@@ -9,6 +9,8 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
   with WordSpecLike
   with BeforeAndAfterAll {
 
+  // Test Probes are special kind of actors with assertion capabilities
+
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
   }
@@ -33,9 +35,9 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
       val workloadString = "I love Akka"
       master ! Work(workloadString)
 
-      // the interaction between the master and the slave actor
+      // the interaction between the master and the slave (Test Prob or MOCK) actor
       slave.expectMsg(SlaveWork(workloadString, testActor))
-      slave.reply(WorkCompleted(3, testActor))
+      slave.reply(WorkCompleted(3, testActor)) //ponemos nosotros a pelo el 3
 
       expectMsg(Report(3)) // testActor receives the Report(3)
     }
@@ -46,7 +48,7 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
       master ! Register(slave.ref)
       expectMsg(RegistrationAck)
 
-      val workloadString = "I love Akka"
+      val workloadString = "I love x  x Akka"
       master ! Work(workloadString)
       master ! Work(workloadString)
 
@@ -54,6 +56,10 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
       slave.receiveWhile() {
         case SlaveWork(`workloadString`, `testActor`) => slave.reply(WorkCompleted(3, testActor))
       }
+
+      //the slave is passive and does nothing so we do a receive while...
+      // We program to reply everytime
+      // This is a combination of an assertion  (if slave receive sth out of the PF the test will FAIL and the programming of our TestProbe, defining what we send
 
       expectMsg(Report(3))
       expectMsg(Report(6))

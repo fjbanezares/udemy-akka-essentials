@@ -6,7 +6,7 @@ import part2actors.ChangingActorBehavior.Mom.MomStart
 object ChangingActorBehavior extends App {
 
 
-  object FussyKid {
+  object  FussyKid {
     case object KidAccept
     case object KidReject
     val HAPPY = "happy"
@@ -14,7 +14,7 @@ object ChangingActorBehavior extends App {
   }
   class FussyKid extends Actor {
     import FussyKid._
-    import Mom._
+    import Mom._  // Mom's messages supported
 
     // internal state of the kid
     var state = HAPPY
@@ -35,13 +35,17 @@ object ChangingActorBehavior extends App {
 
     def happyReceive: Receive = {
       case Food(VEGETABLE) => context.become(sadReceive, false) // change my receive handler to sadReceive
-      case Food(CHOCOLATE) =>
+      case Food(CHOCOLATE) =>  //discardOld = true by default, true is a full replace, false implies stack!
       case Ask(_) => sender() ! KidAccept
     }
 
+    //1.happyReceive
+    //2.sadReceive
+    //3.happyReceive
+
     def sadReceive: Receive = {
-      case Food(VEGETABLE) => context.become(sadReceive, false)
-      case Food(CHOCOLATE) => context.unbecome()
+      case Food(VEGETABLE) => context.become(sadReceive, false)  //instead of nothing it increases the sadness
+      case Food(CHOCOLATE) => context.unbecome() //pop of the stack
       case Ask(_) => sender() ! KidReject
     }
   }
@@ -114,9 +118,10 @@ object ChangingActorBehavior extends App {
     * 1 - recreate the Counter Actor with context.become and NO MUTABLE STATE
     */
 
+
   object Counter {
     case object Increment
-    case object Decrement
+     case object Decrement
     case object Print
   }
 
@@ -140,7 +145,7 @@ object ChangingActorBehavior extends App {
   val counter = system.actorOf(Props[Counter], "myCounter")
 
   (1 to 5).foreach(_ => counter ! Increment)
-  (1 to 3).foreach(_ => counter ! Decrement)
+  (1 to 9).foreach(_ => counter ! Decrement)
   counter ! Print
 
   /**

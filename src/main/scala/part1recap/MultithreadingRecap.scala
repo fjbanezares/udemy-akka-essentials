@@ -9,7 +9,7 @@ object MultithreadingRecap extends App {
 
   val aThread = new Thread(() => println("I'm running in parallel"))
   aThread.start()
-  aThread.join()
+  aThread.join() //wait for the thread to finish
 
   val threadHello = new Thread(() => (1 to 1000).foreach(_ => println("hello")))
   val threadGoodbye = new Thread(() => (1 to 1000).foreach(_ => println("goodbye")))
@@ -71,6 +71,13 @@ object MultithreadingRecap extends App {
     meaningOfLife <- future
     filteredMeaning <- filteredFuture
   } yield meaningOfLife + filteredMeaning
+
+  val aNonsenseFuture2 = for {
+    meaningOfLife <- future
+    filteredMeaning <- filteredFuture
+  } yield meaningOfLife + filteredMeaning
+
+  println(aNonsenseFuture2.isCompleted)
 
   // andThen, recover/recoverWith
 
