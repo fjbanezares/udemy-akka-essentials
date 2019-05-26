@@ -30,10 +30,10 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
       val master = system.actorOf(Props[Master])
       val slave = TestProbe("slave")
       master ! Register(slave.ref)
-      expectMsg(RegistrationAck)
+      expectMsg(RegistrationAck)  //We are the original and we expect the ACK after we sent the registration
 
       val workloadString = "I love Akka"
-      master ! Work(workloadString)
+      master ! Work(workloadString)  //After the master receive the Work it will pass it to the  slave then after receiving the result it will give us the 3
 
       // the interaction between the master and the slave (Test Prob or MOCK) actor
       slave.expectMsg(SlaveWork(workloadString, testActor))
@@ -50,11 +50,11 @@ class TestProbeSpec extends TestKit(ActorSystem("TestProbeSpec"))
 
       val workloadString = "I love x  x Akka"
       master ! Work(workloadString)
-      master ! Work(workloadString)
+      master ! Work(workloadString)  // after this the master send to the Probe SlaveWork(string, original requester o sea nosotros el testActor)
 
       // in the meantime I don't have a slave actor
       slave.receiveWhile() {
-        case SlaveWork(`workloadString`, `testActor`) => slave.reply(WorkCompleted(3, testActor))
+        case SlaveWork(workloadString, testActor) => slave.reply(WorkCompleted(3, testActor))
       }
 
       //the slave is passive and does nothing so we do a receive while...

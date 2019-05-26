@@ -8,7 +8,7 @@ object ChildActorsExercise extends App {
 
   object WordCounterMaster {
     case class Initialize(nChildren: Int)
-    case class WordCountTask(id: Int, text: String)
+    case class WordCountTask(id: Int, text: String)  //Here is the Magic of the Identification Number
     case class WordCountReply(id: Int, count: Int)
   }
   class WordCounterMaster extends Actor {
@@ -17,19 +17,19 @@ object ChildActorsExercise extends App {
     override def receive: Receive = {
       case Initialize(nChildren) =>
         println("[master] initializing...")
-        val childrenRefs = for (i <- 1 to nChildren) yield context.actorOf(Props[WordCounterWorker], s"wcw_$i")
+        val childrenRefs = for (i <- 1 to nChildren) yield context.actorOf(Props[WordCounterWorker], s"wcw_$i")  //creamos una lista de work count workers
         context.become(withChildren(childrenRefs, 0, 0, Map()))
     }
 
     def withChildren(childrenRefs: Seq[ActorRef], currentChildIndex: Int, currentTaskId: Int, requestMap: Map[Int, ActorRef]): Receive = {
       case text: String =>
         println(s"[master] I have received: $text - I will send it to child $currentChildIndex")
-        val originalSender = sender()
+        val originalSender = sender()  //the sender of the text
         val task = WordCountTask(currentTaskId, text)
-        val childRef = childrenRefs(currentChildIndex)
+        val childRef = childrenRefs(currentChildIndex)  // cogemos el ActorRef
         childRef ! task
         val nextChildIndex = (currentChildIndex + 1) % childrenRefs.length
-        val newTaskId = currentTaskId + 1
+        val newTaskId = currentTaskId + 1  //empieza siendo 0
         val newRequestMap = requestMap + (currentTaskId -> originalSender)
         context.become(withChildren(childrenRefs, nextChildIndex, newTaskId, newRequestMap))
       case WordCountReply(id, count) =>
@@ -37,6 +37,8 @@ object ChildActorsExercise extends App {
         val originalSender = requestMap(id)
         originalSender ! count
         context.become(withChildren(childrenRefs, currentChildIndex, currentTaskId, requestMap - id))
+
+        // map - key, quita ese elemento del Map
     }
   }
 
@@ -84,4 +86,25 @@ object ChildActorsExercise extends App {
   // round robin logic
   // 1,2,3,4,5 and 7 tasks
   // 1,2,3,4,5,1,2
+
+  /*
+
+[master] initializing...
+[master] I have received: I love Akka - I will send it to child 0
+[master] I have received: Scala is super dope - I will send it to child 1
+[master] I have received: yes - I will send it to child 2
+[master] I have received: me too - I will send it to child 0
+akka://roundRobinWordCountExercise/user/testActor/master/wcw_1 I have received task 0 with I love Akka
+akka://roundRobinWordCountExercise/user/testActor/master/wcw_2 I have received task 1 with Scala is super dope
+akka://roundRobinWordCountExercise/user/testActor/master/wcw_3 I have received task 2 with yes
+[master] I have received a reply for task id 0 with 3
+akka://roundRobinWordCountExercise/user/testActor/master/wcw_1 I have received task 3 with me too
+[master] I have received a reply for task id 2 with 1
+[test actor] I received a reply: 3
+[master] I have received a reply for task id 1 with 4
+[test actor] I received a reply: 1
+[master] I have received a reply for task id 3 with 2
+[test actor] I received a reply: 4
+[test actor] I received a reply: 2
+   */
 }

@@ -93,5 +93,8 @@ object StartingStoppingActors extends App {
   val watchedChild = system.actorSelection("/user/watcher/watchedChild")
   Thread.sleep(500)
 
-  watchedChild ! PoisonPill
+  watchedChild ! PoisonPill //trigger the death, so the watcher receives the terminate(ref)=
+
+  // any actor can watch any other actor and you receive the death even if the actor is already dead when you receive
+  // It is used in conjunction with context.unwatch if we are no longer interested in the life of the actor
 }

@@ -38,15 +38,15 @@ class TimedAssertionsSpec extends TestKit(
           case WorkResult(result) => result
         }
 
-        assert(results.sum > 5)
+        assert(results.sum > 5) //receiveWhile devuelve una secuencia
       }
     }
 
     "reply to a test probe in a timely manner" in {
       within(1 second) {
         val probe = TestProbe()
-        probe.send(workerActor, "work")
-        probe.expectMsg(WorkResult(42)) // timeout of 0.3 seconds
+        probe.send(workerActor, "work")  // el actor recibe esto y se toma medio segundito para responder, va a fallar por como hemos configurado el timeout en el fichero de configuracion
+        probe.expectMsg(WorkResult(42)) // timeout of 0.3 seconds as we defined in ConfigFactory.load().getConfig("specialTimedAssertionsConfig") for the probe
       }
     }
 

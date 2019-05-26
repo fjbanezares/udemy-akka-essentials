@@ -54,7 +54,14 @@ object ActorsIntro extends App {
   person ! "hi"
 
   //While this is legal it is not very advisable
+/*
+  val Foo = "foo"
+  val foo = "bar"
 
+  "foo" matches {
+    case foo => println("bar")
+    case Foo => println("foo")
+  }
 
-
+*/
 }

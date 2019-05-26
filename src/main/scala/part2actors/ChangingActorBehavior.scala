@@ -203,7 +203,7 @@ object ChangingActorBehavior extends App {
   charlie ! Vote("Roland")
   daniel ! Vote("Roland")
 
-  val voteAggregator = system.actorOf(Props[VoteAggregator])
+  val voteAggregator: ActorRef = system.actorOf(Props[VoteAggregator])
   voteAggregator ! AggregateVotes(Set(alice, bob, charlie, daniel))
 
   /*

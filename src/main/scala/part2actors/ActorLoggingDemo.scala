@@ -11,12 +11,12 @@ object ActorLoggingDemo extends App {
 
     override def receive: Receive = {
       /*
-        1 - DEBUG
-        2 - INFO
-        3 - WARNING/WARN
-        4 - ERROR
+        1 - DEBUG  verbose find out exactly what happens
+        2 - INFO   careful, benign
+        3 - WARNING/WARN  hott
+        4 - ERROR  die
        */
-      case message => logger.debug(message.toString)// LOG it
+      case message => logger.warning(message.toString)// LOG it
     }
   }
 

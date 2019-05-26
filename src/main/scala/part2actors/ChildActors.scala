@@ -29,7 +29,7 @@ object  ChildActors extends App {
 
   class  Child extends Actor {
     override def receive: Receive = {
-      case message => println(s"${self.path} I got: $message") //akka://ParentChildDemo/user/parent/child I got: hey Kid!
+      case message => println(s"${self.path} I got: $message from $sender" ) //akka://ParentChildDemo/user/parent/child I got: hey Kid!
     }
   }
 
@@ -40,21 +40,24 @@ object  ChildActors extends App {
   parent ! CreateChild("child")
   parent ! TellChild("hey Kid!")
 
-  // actor hierarchies
+  // actor hierarchies  TREE LIKE STRUCTURES
   // parent -> child -> grandChild
   //        -> child2 ->
 
   /*
+
+    Who owns parent? We have top level actors
+
     Guardian actors (top-level)
-    - /system = system guardian
+    - /system = system guardian  .... ej logging system implemnted with actors
     - /user = user-level guardian
-    - / = the root guardian
+    - / = the root guardian   ... manages system and user, this dying, the whole actor system will die
    */
 
   /**
     * Actor selection
     */
-  val childSelection = system.actorSelection("/user/parent/child2")
+  val childSelection = system.actorSelection("/user/parent/child22")
   childSelection ! "I found you!"
 
   /**
@@ -110,6 +113,7 @@ object  ChildActors extends App {
         println(s"${self.path} your messasge has been processed.")
         // benign
         account.withdraw(1) // because I can
+        //here breaking the rules of message passing
     }
   }
 
@@ -120,9 +124,16 @@ object  ChildActors extends App {
   bankAccountRef ! InitializeAccount
   bankAccountRef ! Deposit(100)
 
-  Thread.sleep(500)
+  Thread.sleep(500) //make sure the Actor was created
   val ccSelection = system.actorSelection("/user/account/card")
   ccSelection ! CheckStatus
 
   // WRONG!!!!!!
+
+  // We have directly called a methor
+  // extremely hard to debug in real life
+  // All initiates on having a reference to a object and not to ActorRef
+  // here we are exposing ourselves to concurrency issues!!!
+  // this is called CLOSING OVER mutual state or this reference!
+  //
 }

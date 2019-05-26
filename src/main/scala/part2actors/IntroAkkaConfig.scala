@@ -17,12 +17,14 @@ object IntroAkkaConfig extends App {
   val configString =
     """
       | akka {
-      |   loglevel = "ERROR"
+      |   loglevel = "DEBUG"
       | }
     """.stripMargin
 
+  //multilnie String with triple quote ...
+
   val config = ConfigFactory.parseString(configString)
-  val system = ActorSystem("ConfigurationDemo", ConfigFactory.load(config))
+  val system = ActorSystem("ConfigurationDemo", ConfigFactory.load(config)) // configuration object loaded in this Actor System ...
   val actor = system.actorOf(Props[SimpleLoggingActor])
 
   actor ! "A message to remember"
